@@ -18,19 +18,28 @@ function main(initm, initv)
 	end
 
 	function res = velflow(v, m, height)
+		adens = curralt(height)
 		drag = .5*curralt(height)*dragcoef*pi*((3*m/(4*pi*mdensity))^(2/3))*v^2
 		res = (-m*gravity+drag)/m;
 		
 	end
 
 	presSeaLev = 101.325*1000;%pascals
-	h0 = 7*1000; %m
+	seaLevTemp = 288.15; %K
+	tempLapse = .0065; %K/m
+	r = 8.31447; %J/(molK)
+	molarmass = .0289644; %kg/mol
+	absTemp = 288.15; %k, == 15 C
+	
 	function res = curralt(curheight)
-		res = presSeaLev*exp(curheight/h0);
+		tempLapse*curheight/seaLevTemp %debugging
+		pres = presSeaLev*(1-(tempLapse*curheight/seaLevTemp))^(gravity*molarmass/r/tempLapse)
+		%set threshhold altitude? getting imaginary numbers >44323 m
+		res = pres*molarmass/(r*(absTemp-tempLapse*curheight));
 	end
-	for i = logspace(0, 6)
+	for i = linspace(44000,45000)
 		i
-		curralt(i)/1000
+		curralt(i)
 	end
 	flows(0, [inith, initv, initm])
 	
