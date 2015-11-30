@@ -1,3 +1,5 @@
+%current initm: 80
+%current initv: -11*1000
 function main(initm, initv)
 	gravity = 9.8;
 	mdensity = 3.1665; %weighted average of all meteors
@@ -51,13 +53,14 @@ function main(initm, initv)
         end
     end
 
-    results = [];
-    index = 1;
-	for i = linspace(0,80000)
-		results(index) = curralt(i);
-        index = index + 1;
-    end
-    results
-	flows(0, [inith, initv, initm])
+    results = [inith; initv;initm];
+    index = 2;
+% 	for i = linspace(0,80000)
+% 		results(index) = curralt(i);
+%         index = index + 1;
+%     end
+%     results
+ 	[T,Y] = ode45(@flows, 0:20*60, [inith, initv, initm])
+
 	
 end
