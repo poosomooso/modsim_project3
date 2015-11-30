@@ -18,8 +18,8 @@ function main(initm, initv)
 	end
 
 	function res = velflow(v, m, height)
-		adens = curralt(height)
-		drag = .5*curralt(height)*dragcoef*pi*((3*m/(4*pi*mdensity))^(2/3))*v^2
+		adens = curralt(height);
+		drag = .5*curralt(height)*dragcoef*pi*((3*m/(4*pi*mdensity))^(2/3))*v^2;
 		res = (-m*gravity+drag)/m;
 		
 	end
@@ -32,15 +32,32 @@ function main(initm, initv)
 	absTemp = 288.15; %k, == 15 C
 	
 	function res = curralt(curheight)
-		tempLapse*curheight/seaLevTemp %debugging
-		pres = presSeaLev*(1-(tempLapse*curheight/seaLevTemp))^(gravity*molarmass/r/tempLapse)
-		%set threshhold altitude? getting imaginary numbers >44323 m
-		res = pres*molarmass/(r*(absTemp-tempLapse*curheight));
-	end
-	for i = linspace(44000,45000)
-		i
-		curralt(i)
-	end
+        upLimTropo = 12000; %m
+        upLimStrato = 47000; %m
+        upLimMeso = 85000; %m
+        h = curheight / 1000; %m to km
+        
+        if curheight < upLimTropo
+            %only valid in troposphere
+            res = 101325.0 * (288.15 / (288.15 - 6.5 * h)) ^ (34.1632 / -6.5);
+        elseif curheight < upLimStrato
+            %only valid in stratosphere
+            res = 868.0187 * ((228.65 / (228.65 + (2.8*(h - 32)))) ^ (34.1632/2.8));
+        elseif curheight < upLimMeso
+            %only valid in mesosphere
+            res = 3.956420 * (214.65 / (214.65 - 2 * (h - 71))) ^ (34.1632 / -2);
+        else
+            res = 0;
+        end
+    end
+
+    results = [];
+    index = 1;
+	for i = linspace(0,80000)
+		results(index) = curralt(i);
+        index = index + 1;
+    end
+    results
 	flows(0, [inith, initv, initm])
 	
 end
