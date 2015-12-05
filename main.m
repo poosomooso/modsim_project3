@@ -100,7 +100,7 @@ function main(initm, initv)
     options = odeset('Events', @Events);
 
 %%  Ode45 + Graphs
-    [T,Y] = ode45(@flows, [initialTime, finalTime], [inith, initv, initm], options)
+    [T,Y] = ode23(@flows, [initialTime, finalTime], [inith, initv, initm], options)
     figure;
     plot(T, Y(:,1));
     axis([min(T), max(T), 0, max(Y(:,1))]);
