@@ -4,12 +4,14 @@ function main(initm, initv)
     
 %%  Initiate variables
 	gravity = 9.8;
-	mdensity = 3.1665; %weighted average of all meteors
+	%density from http://meteorites.wustl.edu/id/density.htm
+	mdensity = 3166.5; %weighted average of all meteors, kg/m^3
 	dragcoef = .47; %Drag coefficient.
 	evap = (6.05*10^6)/1000; %Energy to vaporize one kg of meteorite
 	inith = 80*1000; %m. Initial height above sea level.
     R = 287.053; %J/kg-K. The specific gas constant.
     
+	% http://www.engineersedge.com/heat_transfer/convective_heat_transfer_coefficients__13378.htm
     heatcoef = 2000; %Forced convection, molten metal and air. Can be anywhere from 2000-45000.
 	
 	function res = flows(~, y)     
@@ -20,7 +22,8 @@ function main(initm, initv)
 		dh = vel;
 		dv = velflow(y(2), mass, height);
         
-        SA = 4*pi*(((3*mass)/(4*pi*mdensity))^(2/3));
+        SA = pi*(((3*mass)/(4*pi*mdensity))^(2/3));
+		% equation from http://adsabs.harvard.edu/full/1951ApJ...113..475C
 		dm = (0.5 * heatcoef * curralt(height) * vel^3 * SA) / evap;
 		
 		res = [dh; dv; dm];
@@ -31,8 +34,12 @@ function main(initm, initv)
 		drag = .5*curralt(height)*dragcoef*pi*((3*m/(4*pi*mdensity))^(2/3))*v^2;
 		res = (-m*gravity+drag)/m;
 		
-    end
-
+	end
+	vel = 0;
+	for vel = 0:1000
+		SA = pi*(((3*initm)/(4*pi*mdensity))^(2/3));
+		dm = (0.5 * heatcoef * curralt(60000) * vel^3 * SA) / evap
+	end
 %%  Initialize variables for air density.
 
 	presSeaLev = 101.325*1000;%pascals
@@ -45,6 +52,7 @@ function main(initm, initv)
 %%  Find air density based on current altitude/air pressure.
     
 	function res = curralt(curheight)
+		% http://www.braeunig.us/space/atmmodel.htm
         upLimTropo = 12000; %m
         upLimStrato = 47000; %m
         upLimMeso = 85000; %m
