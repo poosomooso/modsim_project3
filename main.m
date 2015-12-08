@@ -1,6 +1,6 @@
 %current initm: 80
 %current initv: -11*1000
-function main(initm, initv)
+function res = main(initm, initv)
 
 	%%  Initiate variables
 	gravity = 9.8;
@@ -134,7 +134,7 @@ function main(initm, initv)
 	%%  Initiate Event- Meteor hits Earth
 
 		function [value,isterminal,direction] = Events(t,S)
-			value = +(S(1) > 0 && S(3) > 0); % Extract the current height.
+			value = +(S(1) > 0 && S(3) > 10^-20); % Extract the current height.
 			isterminal = 1; % Stop the integration if height crosses zero or if distance crosses 97 m.
 			direction = -1; % But only if the height or distance is decreasing.
 		end
@@ -145,12 +145,13 @@ function main(initm, initv)
 	options = odeset('Events', @Events);
 
 	%%  Ode45 + Graphs
-	[T,Y] = ode23(@flows, [initialTime, finalTime], [inith, initv, initm, initT], options)
-	figure;
-	plot(T, Y(:,1));
-	axis([min(T), max(T), 0, max(Y(:,1))]);
-	title([num2str(initm), ' kg, ', num2str(inith), ' m, ', num2str(initv), ' m/s']);
-	xlabel('Time (Seconds)');
-	ylabel('Altitude (m)');
-
+	[T,Y] = ode23(@flows, [initialTime, finalTime], [inith, initv, initm, initT], options);
+% 	figure;
+% 	plot(T, Y(:,1));
+% 	axis([min(T), max(T), 0, max(Y(:,1))]);
+% 	title([num2str(initm), ' kg, ', num2str(inith), ' m, ', num2str(initv), ' m/s']);
+% 	xlabel('Time (Seconds)');
+% 	ylabel('Altitude (m)');
+	
+	res = [T(end), Y(end, 1)];
 end
