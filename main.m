@@ -7,7 +7,10 @@ function res = main(initm, initv)
 	%density from http://meteorites.wustl.edu/id/density.htm
 	mdensity = 3166.5; %weighted average of all meteors, kg/m^3
 	dragcoef = .47; %Drag coefficient.
-	evap = (6.05*10^6)/1000; %Energy to vaporize one kg of meteorite
+	%evap = (6.05*10^6)*1000; %Energy to vaporize one kg of meteorite
+	%http://uregina.ca/~astro/Hoba.pdf
+	%J/kg
+	evap = 5*10^6;
 	inith = 80*1000; %m. Initial height above sea level.
 	initT = altTemp(inith);
 	R = 287.053; %J/kg-K. The specific gas constant.
@@ -23,11 +26,7 @@ function res = main(initm, initv)
 
 			dh = vel;
 			dv = velflow(y(2), mass, height);
-
-			%         SA = pi*(((3*mass)/(4*pi*mdensity))^(2/3));
-			% 		% equation from http://adsabs.harvard.edu/full/1951ApJ...113..475C
-			% 		dm = (0.5 * heatcoef * curralt(height) * vel^3 * SA) / evap;
-
+			
 			%to find energy ablated
 			%find energy lost to drag
 			%divide by evap
@@ -36,7 +35,7 @@ function res = main(initm, initv)
 			SA = 4*pi*(((3*mass)/(4*pi*mdensity))^(2/3));
 			dragE = .5*curralt(height)*dragcoef*pi*((3*mass/(4*pi*mdensity))^(2/3))*vel^2*dh;
 			energy = dragE + heatcoef*SA*(altTemp(height) - temp);
-			dm = (energy/evap)/1000;
+			dm = (energy/evap);
 			
 			dt = (-dragE)/(mass*10^3); %10^3 is specific heat
 			
@@ -126,10 +125,22 @@ function res = main(initm, initv)
 % 		index = index + 1;
 % 	end
 % 	figure;
-% 	plot(results, linspace(20000,80000));
+% 	plot(results-270, linspace(20000,80000));
 % 	title('Temperature change as altitude changes');
 % 	ylabel('Altitude (m)');
-% 	xlabel('Temp (K)');
+% 	xlabel('Temp (C)');
+
+% 	results = [inith; initv;initm];
+% 	index = 1;
+% 	for i = linspace(1,80000)
+% 		results(index) = curralt(i);
+% 		index = index + 1;
+% 	end
+% 	figure;
+% 	plot(linspace(1,80000), results);
+% 	title('Air density as altitude changes');
+% 	ylabel('Air density');
+% 	xlabel('Altitude');
 
 	%%  Initiate Event- Meteor hits Earth
 
@@ -147,11 +158,13 @@ function res = main(initm, initv)
 	%%  Ode45 + Graphs
 	[T,Y] = ode23(@flows, [initialTime, finalTime], [inith, initv, initm, initT], options);
 % 	figure;
-% 	plot(T, Y(:,1));
-% 	axis([min(T), max(T), 0, max(Y(:,1))]);
+% 	plot(T, Y(:,2));
+% 	%axis([min(T), max(T), 0, max(Y(:,2))]);
+% 	axis([min(T), max(T), -inf, inf]);
+% 	axis ij
 % 	title([num2str(initm), ' kg, ', num2str(inith), ' m, ', num2str(initv), ' m/s']);
 % 	xlabel('Time (Seconds)');
-% 	ylabel('Altitude (m)');
+% 	ylabel('Velocity (m/s)');
 	
 	res = [T(end), Y(end, 1)];
 end

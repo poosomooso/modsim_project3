@@ -4,26 +4,7 @@
 % masses = 1:51;
 % velocities = 1:10;
 function punchlineRunner()
-
-% 	masses2 = 1000:1000:10000;
-% 	masses3 = 10000:10000:100000;
-% 	masses4 = 100000:100000:10^6;
-% 	masses5 = 10^6:10^6:10^7;
-% 	
-% 	vel1 = -10000:-500:-30000;
-% 	vel2 = -30000:-1000:-72000;
-% 	
-% 
-% 	plotter(masses2, vel1);
-% 	plotter(masses3, vel1);
-% 	plotter(masses4, vel1);
-% 	plotter(masses5, vel1);
-% 
-% 	plotter(masses2, vel2);
-% 	plotter(masses3, vel2);
-% 	plotter(masses4, vel2);
-% 	plotter(masses5, vel2);
-
+	
 	masses6 = logspace(0, 10, 100);
 	velocities6 = -72000:500:-10000;
 	
@@ -45,18 +26,22 @@ function punchlineRunner()
 			i = 1;
 		end
 		figure;
-		size(results)
+		results
 		contourf(masses, velocities, results);
 		hold on
-		contour(masses, velocities, results, [0, 0], 'LineWidth', 3, 'LineColor', 'w');
+		[C, h] = contour(masses, velocities, results, [0, 0], 'LineWidth', 3, 'LineColor', 'w');
 		xlabel('mass (kg)');
 		ylabel('velocities (m/s)');
 		ax = gca;
 		ax.XScale = 'log';
 		caxis([0 60000]);
-		colorbar;
+		colormap('winter')
+		cb = colorbar;
+		ylabel(cb, 'height above the ground (m)')
 		title([num2str(masses(1)), ' to ', num2str(masses(end)), ' kg; ', num2str(velocities(1)), ' to ', num2str(velocities(end)), ' m/s']);
 		drawnow
+		
+		keyboard;
 	end
 
 end
